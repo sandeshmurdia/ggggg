@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Image,
   Pressable,
@@ -20,9 +20,25 @@ type Props = {
 
 export function CartScreen({ navigation }: Props) {
   const { cart, updateQuantity, removeFromCart } = useApp();
+  const [errorMessage, setErrorMessage] = useState('');
   const subtotal = cart.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
   const tax = subtotal * 0.08;
   const total = subtotal + tax;
+
+  const handleProceedToCheckout = () => {
+      const storeName = (
+        cart[0].product as {
+          fulfillment?: {
+            store?: {
+              name: string;
+            };
+          };
+        }
+      ).fulfillment!.store!.name;
+
+      console.log('Preparing checkout for store', storeName);
+      navigation.navigate('Checkout');
+  };
 
   if (cart.length === 0) {
     return (
@@ -81,9 +97,10 @@ export function CartScreen({ navigation }: Props) {
           <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
         </View>
       </View>
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
       <PrimaryButton
         title="Proceed to Checkout"
-        onPress={() => navigation.navigate('Checkout')}
+        onPress={handleProceedToCheckout}
       />
     </ScrollView>
   );
@@ -143,4 +160,5 @@ const styles = StyleSheet.create({
   totalRow: { marginTop: 8, marginBottom: 0, paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.border },
   totalLabel: { fontSize: 18, fontWeight: '700', color: colors.text },
   totalValue: { fontSize: 18, fontWeight: '800', color: colors.primary },
+  errorText: { fontSize: 14, color: colors.error, marginBottom: spacing.md },
 });
