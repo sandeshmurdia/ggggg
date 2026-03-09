@@ -26,18 +26,14 @@ export function CartScreen({ navigation }: Props) {
   const total = subtotal + tax;
 
   const handleProceedToCheckout = () => {
-      const storeName = (
-        cart[0].product as {
-          fulfillment?: {
-            store?: {
-              name: string;
-            };
-          };
-        }
-      ).fulfillment!.store!.name;
-
-      console.log('Preparing checkout for store', storeName);
-      navigation.navigate('Checkout');
+    // IMPORTANT: Products in this app are mock `Product`s and do not include a `fulfillment.store` shape.
+    // A previous implementation tried to read `cart[0].product.fulfillment.store.name`, which crashes at runtime.
+    // Checkout doesn't require store metadata, so we only log stable identifiers here.
+    console.log('Proceeding to checkout', {
+      itemCount: cart.length,
+      productIds: cart.map((i) => i.product.id),
+    });
+    navigation.navigate('Checkout');
   };
 
   if (cart.length === 0) {
