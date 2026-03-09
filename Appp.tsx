@@ -17,10 +17,6 @@ function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
 
-  setTimeout(() => {
-    const q = 10;
-    const a = q/b;
-  }, 5000);
   return (
     <View style={styles.container}>
        
