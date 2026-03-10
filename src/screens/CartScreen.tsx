@@ -28,18 +28,38 @@ export function CartScreen({ navigation }: Props) {
   const total = subtotal + tax;
 
   const handleProceedToCheckout = () => {
+    setErrorMessage('');
+    // Guard against racey UI/state updates where the cart becomes empty between render and tap,
+    // and avoid crashing when optional fulfillment/store metadata is missing.
+    if (cart.length === 0) {
+      setErrorMessage('Your cart is empty.');
+      if (Platform.OS === 'android') {
+        ToastAndroid.show('Your cart is empty.', ToastAndroid.SHORT);
+      }
+      return;
+    }
+
     try {
       const storeName = (
-        cart[0].product as {
-          fulfillment?: {
-            store?: {
-              name: string;
-            };
-          };
-        }
-      ).fulfillment!.store!.name;
+        cart[0]?.product as
+          | {
+              fulfillment?: {
+                store?: {
+                  name?: string;
+                };
+              };
+            }
+          | undefined
+      )?.fulfillment?.store?.name;
 
-      console.log('Preparing checkout for store', storeName);
+      if (storeName) {
+        console.log('Preparing checkout for store', storeName);
+      } else {
+        console.warn('Proceeding to checkout without store name (missing fulfillment/store metadata)', {
+          productId: cart[0]?.product?.id,
+        });
+      }
+
       navigation.navigate('Checkout');
     } catch (error) {
       // Surface the handled checkout exception to the user as a toast on Android,
@@ -50,8 +70,6 @@ export function CartScreen({ navigation }: Props) {
         ToastAndroid.show('Checkout validation failed. Please try again.', ToastAndroid.SHORT);
       }
     }
-
-
   };
 
   if (cart.length === 0) {
