@@ -13,7 +13,7 @@ console.log('izpt  dasdasdasd ');
 
 
 
-zipy.init("5a83c383");
+zipy.init("ce16257c");
 
 
 AppRegistry.registerComponent(appName, () => withGestureCapture(App));
