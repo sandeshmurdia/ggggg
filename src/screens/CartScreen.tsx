@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import {
   Image,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  ToastAndroid,
   View,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -26,6 +28,7 @@ export function CartScreen({ navigation }: Props) {
   const total = subtotal + tax;
 
   const handleProceedToCheckout = () => {
+    try {
       const storeName = (
         cart[0].product as {
           fulfillment?: {
@@ -38,6 +41,17 @@ export function CartScreen({ navigation }: Props) {
 
       console.log('Preparing checkout for store', storeName);
       navigation.navigate('Checkout');
+    } catch (error) {
+      // Surface the handled checkout exception to the user as a toast on Android,
+      // while still keeping the console error for debugging/monitoring tools.
+      console.error(error);
+      setErrorMessage('Checkout validation failed. Please try again.');
+      if (Platform.OS === 'android') {
+        ToastAndroid.show('Checkout validation failed. Please try again.', ToastAndroid.SHORT);
+      }
+    }
+
+
   };
 
   if (cart.length === 0) {
