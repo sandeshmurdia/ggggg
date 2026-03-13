@@ -1,0 +1,43 @@
+apply plugin: "com.android.library"
+
+android {
+  // AGP 8-compatible Android library config so this vendored module publishes variants.
+  namespace "com.zipyaireactnative"
+  compileSdk rootProject.ext.compileSdkVersion
+
+  defaultConfig {
+    minSdk rootProject.ext.minSdkVersion
+    targetSdk rootProject.ext.targetSdkVersion
+  }
+
+  sourceSets {
+    main {
+      manifest.srcFile "src/main/AndroidManifestNew.xml"
+    }
+  }
+
+  buildTypes {
+    debug {
+      minifyEnabled false
+    }
+    release {
+      minifyEnabled false
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+}
+
+repositories {
+  google()
+  mavenCentral()
+}
+
+dependencies {
+  implementation("com.facebook.react:react-android")
+  implementation("androidx.work:work-runtime:2.8.1")
+  implementation("com.github.anrwatchdog:anrwatchdog:1.4.0")
+}

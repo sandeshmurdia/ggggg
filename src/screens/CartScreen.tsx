@@ -41,10 +41,13 @@ export function CartScreen({ navigation }: Props) {
 
       console.log('Preparing checkout for store', storeName);
       navigation.navigate('Checkout');
-    } catch (error) {
+    } catch (error : any) {
       // Surface the handled checkout exception to the user as a toast on Android,
       // while still keeping the console error for debugging/monitoring tools.
       console.error(error);
+      console.error("Got error here", error);
+      console.error("got here", error.stack);
+      console.error("got here 2", error.message);
       setErrorMessage('Checkout validation failed. Please try again.');
       if (Platform.OS === 'android') {
         ToastAndroid.show('Checkout validation failed. Please try again.', ToastAndroid.SHORT);
