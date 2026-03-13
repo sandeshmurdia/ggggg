@@ -29,17 +29,28 @@ export function CartScreen({ navigation }: Props) {
 
   const handleProceedToCheckout = () => {
     try {
-      const storeName = (
-        cart[0].product as {
-          fulfillment?: {
-            store?: {
-              name: string;
-            };
-          };
+      // NOTE: Some product payloads (mock/local) don't include fulfillment/store data.
+      // We should not block checkout or throw if this optional metadata is missing.
+      const firstItem = cart[0];
+      if (!firstItem) {
+        setErrorMessage('Your cart is empty. Please add items before checking out.');
+        if (Platform.OS === 'android') {
+          ToastAndroid.show(
+            'Your cart is empty. Please add items before checking out.',
+            ToastAndroid.SHORT
+          );
         }
-      ).fulfillment!.store!.name;
+        return;
+      }
 
-      console.log('Preparing checkout for store', storeName);
+      const storeName = (firstItem.product as { fulfillment?: { store?: { name?: string } } })
+        .fulfillment?.store?.name;
+      if (storeName) {
+        console.log('Preparing checkout for store', storeName);
+      } else {
+        // Keep logging minimal and non-sensitive: only product id for correlation.
+        console.warn('Preparing checkout without store context', { productId: firstItem.product.id });
+      }
       navigation.navigate('Checkout');
     } catch (error) {
       // Surface the handled checkout exception to the user as a toast on Android,
